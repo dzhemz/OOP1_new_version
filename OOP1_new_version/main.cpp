@@ -13,6 +13,8 @@ int main() {
         new_line = get_string();
         append(collection1, new_line);
     }
-    insertValue(collection1, get_string(), 1);
-    printContent(collection1);
+    char* filename = get_string();
+    saveMultiset(collection1, filename);
+    collection2 = readMultiset(filename, '\n');
+    printContent(collection2);
 }
