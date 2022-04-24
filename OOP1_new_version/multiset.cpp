@@ -144,7 +144,7 @@ multisetNode* getNode(multiset* currentMultiset, int index) {
 	// сравнивает индекс каждого узла
 	// с заданным индексом,
 	// пока не найдёт искомый узел
-	if (index < 0 || index >= currentMultiset->length) {
+	if (index < 0 || index >= currentMultiset->length || currentMultiset->length == 0) {
 		return NULL;
 	}
 	multisetNode* currentNode = currentMultiset->first;
@@ -209,23 +209,28 @@ char* popElement(multiset* currentMultiset, int index) {
 }
 
 
-// функция добавления элемента в конец множества
+// функция добавления элемента в множество
+// добавляет таким образом, чтобы множество было упорядоченным
 void append(multiset* currentMultiset, char* s) {
-	if (currentMultiset->length > 0) {
-		// запрашиваем указатель на крайний элемент в множестве
-		multisetNode* currentNode = getNode(currentMultiset, currentMultiset->length - 1);
-		// создаём новый узел
-		multisetNode* new_node = createMultisetNode(currentMultiset->length, NULL, currentNode, s);
-		// устанавливаем новый указатель
-		currentNode->next = new_node;
-		// увеличиваем значение длины множества на единицу
+	multisetNode* currentNode = currentMultiset->first;
+	while (currentNode != NULL && strcmp(currentNode->str, s) < 0) {
+		currentNode = iterator(currentMultiset, currentNode);
 	}
-	else {
-		// создаём первый узел и добавляем его в коллекцию
-		multisetNode* new_node = createMultisetNode(currentMultiset->length, NULL, NULL, s);
-		currentMultiset->first = new_node;
+	if (currentNode != NULL && strcmp(currentNode->str, s) >= 0) {
+		insertValue(currentMultiset, s, currentNode->index);
 	}
-	currentMultiset->length++;
+	else if (currentNode == NULL) {
+		currentNode = createMultisetNode(0, NULL, getNode(currentMultiset, currentMultiset->length - 1), s);
+		if (currentMultiset->length == 0) {
+			currentMultiset->length++;
+			currentMultiset->first = currentNode;
+		}
+		else {
+			getNode(currentMultiset, currentMultiset->length - 1)->next = currentNode;
+			recountIndexes(currentMultiset);
+			currentMultiset->length++;
+		}
+	}
 }
 
 // функия итератора возращает следующий элемент в коллекции, если он существует
@@ -420,11 +425,15 @@ multiset* readMultiset(char* filename, char lastSymbol) {
 			currentSymbol = fgetc(file_for_read);
 			// если символ равен символу разделителю
 			if (currentSymbol == lastSymbol) {
-				// добавляем строку в мультимножество
-				content = (char*) realloc(content, count * sizeof(char));
-				if (content == NULL) exit(0);
+				// запрашиваем память для расширенной строки
+				content = (char*)realloc(content, count * sizeof(char));
 
-				content[count - 1] = 0;
+				// вставляем нулевой символ
+				content[count] = '/0';
+				// добавляем строку в мультимножество
+				// добавляем строку в мультимножество
+				// добавляем строку в мультимножество
+				// добавляем строку в мультимножество
 				append(result, content);
 				// запрашиваем её вновь
 				content = (char*)malloc(sizeof(char));
